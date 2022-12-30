@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 def expenses():
-    st.write("TRACCIATORE DI SPESE 2023")
+    st.title("TRACCIATORE DI SPESE 2023")
     categorie = ["Spesa", "Libri", "Salute", "Ristorazione", "Intrattenimento",
                 "Animali", "Scuola", "Oggetti", "Gas", "Luce", "Internet",
                 "Casa", "Tecnologia", "Trasporti", "Vacanze", "Abbigliamento",
@@ -89,9 +89,9 @@ def expenses():
         if "Prova" in entry["descrizione"]:
             db.delete(entry["key"])
 
+st.cache(suppress_st_warning=True)
 def check_password():
     """Returns `True` if the user had the correct password."""
-    st.cache(suppress_st_warning=True)
     def password_entered():
         """Checks whether a password entered by the user is correct."""
         if st.session_state["password"] == st.secrets["password"]:
