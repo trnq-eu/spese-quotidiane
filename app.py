@@ -5,22 +5,23 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 st.title("TRACCIATORE DI SPESE 2023")
-categorie = ["Spesa", "Libri", "Salute", "Ristorazione", "Intrattenimento",
-            "Animali", "Scuola", "Oggetti", "Gas", "Luce", "Internet",
-            "Casa", "Tecnologia", "Trasporti", "Vacanze", "Abbigliamento",
-            "Regali", "Bimbi", "Tasse", "Altro"     
-            ]
-
-now = datetime.now()
-
-# Connessione al database tramite la Project Key di Deta
-deta = Deta(st.secrets["deta_key"])
-
-# Crea il database
-db = deta.Base("spese-db")
 
 @st.cache(suppress_st_warning=True)
 def expenses():
+    categorie = ["Spesa", "Libri", "Salute", "Ristorazione", "Intrattenimento",
+                "Animali", "Scuola", "Oggetti", "Gas", "Luce", "Internet",
+                "Casa", "Tecnologia", "Trasporti", "Vacanze", "Abbigliamento",
+                "Regali", "Bimbi", "Tasse", "Altro"     
+                ]
+
+    now = datetime.now()
+
+    # Connessione al database tramite la Project Key di Deta
+    deta = Deta(st.secrets["deta_key"])
+
+    # Crea il database
+    db = deta.Base("spese-db")
+
     with st.form('form'):
         importo = st.number_input('Importo: ', value=0, step=10)
         categoria = st.selectbox('Categoria: ', categorie)
