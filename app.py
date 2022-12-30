@@ -4,23 +4,23 @@ from datetime import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
 
+st.title("TRACCIATORE DI SPESE 2023")
+categorie = ["Spesa", "Libri", "Salute", "Ristorazione", "Intrattenimento",
+            "Animali", "Scuola", "Oggetti", "Gas", "Luce", "Internet",
+            "Casa", "Tecnologia", "Trasporti", "Vacanze", "Abbigliamento",
+            "Regali", "Bimbi", "Tasse", "Altro"     
+            ]
+
+now = datetime.now()
+
+# Connessione al database tramite la Project Key di Deta
+deta = Deta(st.secrets["deta_key"])
+
+# Crea il database
+db = deta.Base("spese-db")
+
+@st.cache(suppress_st_warning=True)
 def expenses():
-    st.title("TRACCIATORE DI SPESE 2023")
-    categorie = ["Spesa", "Libri", "Salute", "Ristorazione", "Intrattenimento",
-                "Animali", "Scuola", "Oggetti", "Gas", "Luce", "Internet",
-                "Casa", "Tecnologia", "Trasporti", "Vacanze", "Abbigliamento",
-                "Regali", "Bimbi", "Tasse", "Altro"     
-                ]
-
-    now = datetime.now()
-
-    # Connessione al database tramite la Project Key di Deta
-    deta = Deta(st.secrets["deta_key"])
-
-    # Crea il database
-    db = deta.Base("spese-db")
-
-
     with st.form('form'):
         importo = st.number_input('Importo: ', value=0, step=10)
         categoria = st.selectbox('Categoria: ', categorie)
@@ -84,39 +84,11 @@ def expenses():
 
 
 
-    # Cancellare i record che contengono la parola "prova" nella descrizione
-    for entry in db_content:
-        if "Prova" in entry["descrizione"]:
-            db.delete(entry["key"])
+# Esempio di cancellazione di record che contengono la parola "prova" nella descrizione
+# for entry in db_content:
+#     if "Prova" in entry["descrizione"]:
+#         db.delete(entry["key"])
 
-st.cache(suppress_st_warning=True)
-def check_password():
-    """Returns `True` if the user had the correct password."""
-    def password_entered():
-        """Checks whether a password entered by the user is correct."""
-        if st.session_state["password"] == st.secrets["password"]:
-            st.session_state["password_correct"] = True
-            del st.session_state["password"]  # don't store password
-        else:
-            st.session_state["password_correct"] = False
 
-    if "password_correct" not in st.session_state:
-        # First run, show input for password.
-        st.text_input(
-            "Password", type="password", on_change=password_entered, key="password"
-        )
-        return False
-    elif not st.session_state["password_correct"]:
-        # Password not correct, show input + error.
-        st.text_input(
-            "Password", type="password", on_change=password_entered, key="password"
-        )
-        st.error("😕 Password incorrect")
-        return False
-    else:
-        # Password correct.
-        return True
-
-if check_password():
-    expenses()
+expenses()
 
