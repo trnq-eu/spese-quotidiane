@@ -13,6 +13,7 @@ categorie = ["Spesa", "Libri", "Salute", "Ristorazione", "Intrattenimento",
             ]
 
 now = datetime.now()
+current_year = now.year
 
 # Connessione al database tramite la Project Key di Deta
 deta = Deta(st.secrets["deta_key"])
@@ -41,13 +42,13 @@ st.write("Ultimi record: ", df.tail())
 df['timestamp'] = pd.to_datetime(df['timestamp'])
 
 # Filtra i record del 2023
-df_2023 = df[df["timestamp"].dt.year == 2023]
+df_current = df[df["timestamp"].dt.year == current_year]
 
 # Raggruppa i dati per mese e somma le spese per ogni mese
-spese_mensili = df_2023.groupby(df_2023.timestamp.dt.month)['importo'].sum()
+spese_mensili = df_current.groupby(df_current.timestamp.dt.month)['importo'].sum()
 
 # Raggruppa le spese per categoria
-spese_categoria = df_2023.groupby("categoria")["importo"].sum()
+spese_categoria = df_current.groupby("categoria")["importo"].sum()
 
 # Crea due subplot per poter visualizzare due grafici diversi e ovviare alla deprecazione di st.pyplot()
 fig, axs = plt.subplots(2,1)
@@ -84,7 +85,7 @@ st.download_button(
 
 
 
-# Cancellare i record che contengono la parola "prova" nella descrizione
-# for entry in db_content:
-#     if "Prova" in entry["descrizione"]:
-#         db.delete(entry["key"])
+# Esempio di codice per cancellare i record che contengono la parola "prova" nella descrizione
+for entry in db_content:
+    if "Prova" in entry["descrizione"]:
+        db.delete(entry["key"])
