@@ -5,6 +5,8 @@ Un'applicazione per il tracciamento e la visualizzazione delle spese quotidiane.
 L'applicazione è scritta in Python e utilizza il framework [Streamlit](https://streamlit.io/).
 Il database dei record è gestito con [Deta](https://www.deta.sh/), un database NoSQL in cloud.
 
+Per connettere Streamlit al database seguire le istruzioni [qui](https://docs.streamlit.io/knowledge-base/tutorials/databases/deta-base)
+
 Altre librerie utilizzate: Pandas per la creazionde dei dataframe e Matplotlib Pyplot per i grafici.
 
 La prima parte dell'applicazione è composta da un form che consente di inserire nuovi record. Per ogni record si può indicare l'importo, la categoria (da una lista) e una breve descrizione.
