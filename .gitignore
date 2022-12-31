@@ -1,2 +1,7 @@
 .streamlit/secrets.toml
 queries.py
+app_pswd.py
+app_nocache.py
+app_old.py
+/venv
+/spese-quotidiane
