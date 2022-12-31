@@ -21,7 +21,6 @@ deta = Deta(st.secrets["deta_key"])
 # Crea il database
 db = deta.Base("spese-db")
 
-
 with st.form('form'):
     importo = st.number_input('Importo: ', value=0, step=10)
     categoria = st.selectbox('Categoria: ', categorie)
@@ -33,22 +32,28 @@ if submitted:
     db.put({"importo": importo, "categoria": categoria, "descrizione": descrizione,
             "timestamp": timestamp})
 
-db_content = db.fetch().items
+def read_and_process_data():
+    db_content = db.fetch().items            
+    df = pd.DataFrame(db_content)
 
-df = pd.DataFrame(db_content)
-st.write("Ultimi record: ", df.tail())
+    # Converti il campo timestamp in un oggetto datatime di pandas
+    df['timestamp'] = pd.to_datetime(df['timestamp'])
 
-# Converti il campo timestamp in un oggetto datatime di pandas
-df['timestamp'] = pd.to_datetime(df['timestamp'])
+    # Filtra i record del 2023
+    df_current = df[df["timestamp"].dt.year == current_year]
 
-# Filtra i record del 2023
-df_current = df[df["timestamp"].dt.year == current_year]
+    # Raggruppa i dati per mese e somma le spese per ogni mese
+    spese_mensili = df_current.groupby(df_current.timestamp.dt.month)['importo'].sum()
 
-# Raggruppa i dati per mese e somma le spese per ogni mese
-spese_mensili = df_current.groupby(df_current.timestamp.dt.month)['importo'].sum()
+    # Raggruppa le spese per categoria
+    spese_categoria = df_current.groupby("categoria")["importo"].sum()
 
-# Raggruppa le spese per categoria
-spese_categoria = df_current.groupby("categoria")["importo"].sum()
+    return spese_mensili, spese_categoria, df_current
+
+
+spese_mensili, spese_categoria, df_current = read_and_process_data()
+
+st.write("Ultimi record: ", df_current.tail())
 
 # Crea due subplot per poter visualizzare due grafici diversi e ovviare alla deprecazione di st.pyplot()
 fig, axs = plt.subplots(2,1)
@@ -70,6 +75,9 @@ st.pyplot(fig)
 
 # Creare un bottone per effettuare il download di un file csv dell'intero db
 # Crea il csv a partire dal dataframe
+
+db_content = db.fetch().items            
+df = pd.DataFrame(db_content)
 csv = df.to_csv(index=False).encode('utf-8')
 
 # Crea un bottone per scaricare il file csv
