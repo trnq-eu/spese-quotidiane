@@ -53,7 +53,8 @@ def read_and_process_data():
 
 spese_mensili, spese_categoria, df_current = read_and_process_data()
 
-st.write("Ultimi record: ", df_current.tail())
+df_clean = df_current[df_current['descrizione'] != 'Placeholder']
+st.write("Ultimi record: ", df_clean.tail())
 
 # Crea due subplot per poter visualizzare due grafici diversi e ovviare alla deprecazione di st.pyplot()
 fig, axs = plt.subplots(2,1)
