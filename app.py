@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 
 st.title("TRACCIATORE DI SPESE 2023")
+
 categorie = ["Spesa", "Libri", "Salute", "Ristorazione", "Intrattenimento",
             "Animali", "Scuola", "Oggetti", "Gas", "Luce", "Internet",
             "Casa", "Tecnologia", "Trasporti", "Vacanze", "Abbigliamento",
@@ -28,9 +29,13 @@ with st.form('form'):
     timestamp = now.strftime('%Y-%m-%d')
     submitted = st.form_submit_button('INVIA')
 
-if submitted:
-    db.put({"importo": importo, "categoria": categoria, "descrizione": descrizione,
-            "timestamp": timestamp})
+
+
+def data_cleaning(db_content):
+#     Esempio di codice per cancellare i record che contengono la parola "prova" nella descrizione
+    for entry in db_content:
+        if "Prova" in entry["descrizione"]:
+            db.delete(entry["key"])
 
 def read_and_process_data():
     db_content = db.fetch().items            
@@ -47,54 +52,61 @@ def read_and_process_data():
 
     # Raggruppa le spese per categoria
     spese_categoria = df_current.groupby("categoria")["importo"].sum()
+    data_cleaning(db_content)
 
-    return spese_mensili, spese_categoria, df_current
+    return spese_mensili, spese_categoria, df_current, db_content
+
+# Invio form
+def form_submission():
+    db.put({"importo": importo, "categoria": categoria, "descrizione": descrizione,
+            "timestamp": timestamp})
 
 
-spese_mensili, spese_categoria, df_current = read_and_process_data()
+def data_plot():    
+    spese_mensili, spese_categoria, df_current, db_content = read_and_process_data()
 
-df_clean = df_current[df_current['descrizione'] != 'Placeholder']
-st.write("Ultimi record: ", df_clean.tail())
+    df_clean = df_current[df_current['descrizione'] != 'Placeholder'].sort_values(by="timestamp")
+    st.write("Ultimi record: ", df_clean.tail(10))
 
-# Crea due subplot per poter visualizzare due grafici diversi e ovviare alla deprecazione di st.pyplot()
-fig, axs = plt.subplots(2,1)
-plt.subplots_adjust(hspace=0.5)
+    # Crea due subplot per poter visualizzare due grafici diversi e ovviare alla deprecazione di st.pyplot()
+    fig, axs = plt.subplots(2,1)
+    plt.subplots_adjust(hspace=0.5)
 
-# Plotta il grafico delle spese suddivise per mese
-axs[0].bar(spese_mensili.index, spese_mensili.values)
-axs[0].set_xticks(spese_mensili.index)
-axs[0].set_ylabel("Importo")
-axs[0].set_title("Spese suddivise per mese")
+    # Plotta il grafico delle spese suddivise per mese
+    axs[0].bar(spese_mensili.index, spese_mensili.values)
+    axs[0].set_xticks(spese_mensili.index)
+    axs[0].set_ylabel("Importo")
+    axs[0].set_title("Spese suddivise per mese")
 
-# Plotta il grafico delle spese suddivise per categoria
-axs[1].bar(spese_categoria.index, spese_categoria.values)
-axs[1].set_xticks(spese_categoria.index)
-axs[1].set_ylabel("Importo")
-axs[1].set_title("Spese suddivise per categoria")
+    # Plotta il grafico delle spese suddivise per categoria
+    axs[1].bar(spese_categoria.index, spese_categoria.values)
+    axs[1].set_xticks(spese_categoria.index)
+    axs[1].set_ylabel("Importo")
+    axs[1].set_title("Spese suddivise per categoria")
 
-st.pyplot(fig)
+    st.pyplot(fig)
 
-# Creare un bottone per effettuare il download di un file csv dell'intero db
-# Crea il csv a partire dal dataframe
+    # Creare un bottone per effettuare il download di un file csv dell'intero db
+    # Crea il csv a partire dal dataframe
 
-db_content = db.fetch().items            
-df = pd.DataFrame(db_content)
-csv = df.to_csv(index=False).encode('utf-8')
+    df = pd.DataFrame(db_content)
+    csv = df.to_csv(index=False).encode('utf-8')
 
-# Crea un bottone per scaricare il file csv
-st.download_button(
-    "Clicca per scaricare il file csv",
-    csv,
-    "spese.csv",
-    "text/csv",
-    key='download-csv'
-)
+    # Crea un bottone per scaricare il file csv
+    st.download_button(
+        "Clicca per scaricare il file csv",
+        csv,
+        "spese.csv",
+        "text/csv",
+        key='download-csv'
+    )
 # Cliccando il bottone, scrive un file csv all'interno del browser
 
 
 
+if submitted:
+    form_submission()
+    data_plot()
 
-# Esempio di codice per cancellare i record che contengono la parola "prova" nella descrizione
-for entry in db_content:
-    if "Prova" in entry["descrizione"]:
-        db.delete(entry["key"])
+if st.button("Visualizza i dati"):
+    data_plot()
