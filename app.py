@@ -79,7 +79,7 @@ def data_plot():
     axs[0].set_title("Spese suddivise per mese")
 
     # Plotta il grafico delle spese suddivise per categoria
-    axs[1].bar(spese_categoria.index, spese_categoria.values)
+    axs[1].barh(spese_categoria.index, spese_categoria.values)
     axs[1].set_xticks(spese_categoria.index)
     axs[1].set_ylabel("Importo")
     axs[1].set_title("Spese suddivise per categoria")
