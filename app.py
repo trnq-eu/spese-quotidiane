@@ -69,7 +69,7 @@ def data_plot():
     st.write("Ultimi record: ", df_clean.tail(10))
 
     # Crea due subplot per poter visualizzare due grafici diversi e ovviare alla deprecazione di st.pyplot()
-    fig, axs = plt.subplots(2,1)
+    fig, axs = plt.subplots(2,1, figsize=(6,8))
     plt.subplots_adjust(hspace=0.5)
 
     # Plotta il grafico delle spese suddivise per mese
