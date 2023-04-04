@@ -70,7 +70,7 @@ def data_plot():
 
     # Crea due subplot per poter visualizzare due grafici diversi e ovviare alla deprecazione di st.pyplot()
     fig, axs = plt.subplots(2,1, figsize=(6,12))
-    plt.subplots_adjust(hspace=0.5)
+    # plt.subplots_adjust(hspace=0.5)
 
     # Plotta il grafico delle spese suddivise per mese
     axs[0].bar(spese_mensili.index, spese_mensili.values)
